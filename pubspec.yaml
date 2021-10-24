@@ -39,6 +39,7 @@ dependencies:
   usb_serial: ^0.3.0
   provider: ^6.0.1
   stream_transform: ^2.0.0
+  convert: ^3.0.1
 dev_dependencies:
   flutter_test:
     sdk: flutter

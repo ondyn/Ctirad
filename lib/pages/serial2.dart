@@ -1,10 +1,12 @@
 import 'dart:async';
 import 'dart:typed_data';
 
+import 'package:ctirad/stores/app.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:usb_serial/transaction.dart';
 import 'package:usb_serial/usb_serial.dart';
-
+import 'package:convert/convert.dart';
 import '../utils.dart';
 
 class Serial2 extends StatefulWidget {
@@ -19,8 +21,8 @@ class _MyAppState extends State<Serial2> {
   List<Widget> _serialData = [];
   bool isHexMode = true;
 
-  StreamSubscription<String>? _subscription;
-  Transaction<String>? _transaction;
+  StreamSubscription<Uint8List>? _subscription;
+  Transaction<Uint8List>? _transaction;
   UsbDevice? _device;
 
   TextEditingController _textController = TextEditingController();
@@ -64,14 +66,17 @@ class _MyAppState extends State<Serial2> {
     await _port!.setRTS(true);
     await _port!.setPortParameters(19200, UsbPort.DATABITS_8, UsbPort.STOPBITS_1, UsbPort.PARITY_NONE);
 
-    _transaction = Transaction.stringTerminated(_port!.inputStream as Stream<Uint8List>, Uint8List.fromList([0xBE, 0xEF]));
+    _transaction = Transaction.terminated(_port!.inputStream as Stream<Uint8List>, Uint8List.fromList([0xBE, 0xEF]));
 
     _subscription = _transaction!.stream.listen((line) {
       setState(() {
-        _serialData.add(Text(line));
-        print("Receive: $line");
-        String recvData = formatReceivedData(line);
-        print(recvData);
+        String recvData = hex.encode(line);
+        _serialData.add(Text(recvData));
+        // print("Receive: $line text: ${recvData}");
+
+        Provider.of<AppModel>(context, listen: false)
+            .updateTemperature(line[2]);
+
         if (_serialData.length > 20) {
           _serialData.removeAt(0);
         }

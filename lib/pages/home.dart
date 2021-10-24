@@ -51,7 +51,13 @@ class _HomePageState extends State<HomePage> {
           children: [
             ClockPage(),
             Serial2(),
-            Icon(Icons.wb_sunny_outlined),
+            Center(
+              child: Column(
+                children: [
+                  Text('${store.temperature}'),
+                ],
+              ),
+            ),
             Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,

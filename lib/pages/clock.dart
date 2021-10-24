@@ -18,12 +18,12 @@ class _ClockPageState extends State<ClockPage> {
     initializeDateFormatting(Platform.localeName);
     Intl.defaultLocale = Platform.localeName;
 
-    String languageCode = Localizations.localeOf(context).languageCode;
+    // String languageCode = Localizations.localeOf(context).languageCode;
 
     var formattedDate = DateFormat('EEEE d. M. yyyy').format(now);
     var timezoneString = now.timeZoneOffset.toString().split('.').first;
-    var offsetSign = '';
-    if (!timezoneString.startsWith('-')) offsetSign = '+';
+    // var offsetSign = '';
+    // if (!timezoneString.startsWith('-')) offsetSign = '+';
 
     return Container(
         child: Column(
