@@ -4,6 +4,7 @@ import 'package:ctirad/pages/settings/setting_baudrate.dart';
 import 'package:ctirad/stores/app.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'models/battery_provider.dart';
 import 'pages/settings/setting_device.dart';
 import 'package:provider/provider.dart';
 
@@ -29,7 +30,12 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       title: 'Ctirad',
       theme: ThemeData.dark(),
-      home: HomePage(),
+      home: MultiProvider(
+        providers: [
+          ChangeNotifierProvider(create: (context) => BatteryProvider()),
+        ],
+        child: HomePage(),
+      ),
       routes: {
         "/setting": (context) => SettingPage(),
         "/setting/device": (context) => SettingDevicePage(),

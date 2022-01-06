@@ -64,15 +64,18 @@ class _MyAppState extends State<Serial2> {
 
     await _port!.setDTR(true);
     await _port!.setRTS(true);
-    await _port!.setPortParameters(19200, UsbPort.DATABITS_8, UsbPort.STOPBITS_1, UsbPort.PARITY_NONE);
+    await _port!.setPortParameters(
+        19200, UsbPort.DATABITS_8, UsbPort.STOPBITS_1, UsbPort.PARITY_NONE);
 
-    _transaction = Transaction.terminated(_port!.inputStream as Stream<Uint8List>, Uint8List.fromList([0xBE, 0xEF]));
+    _transaction = Transaction.terminated(
+        _port!.inputStream as Stream<Uint8List>,
+        Uint8List.fromList([0xBE, 0xEF]));
 
     _subscription = _transaction!.stream.listen((line) {
       setState(() {
         String recvData = hex.encode(line);
         _serialData.add(Text(recvData));
-        // print("Receive: $line text: ${recvData}");
+        print("Receive: $line text: ${recvData}");
 
         Provider.of<AppModel>(context, listen: false)
             .updateTemperature(line[2]);
@@ -101,7 +104,8 @@ class _MyAppState extends State<Serial2> {
       _ports.add(ListTile(
           leading: Icon(Icons.usb),
           title: Text(device.productName!),
-          subtitle: Text(device.manufacturerName != null ? device.manufacturerName! : ''),
+          subtitle: Text(
+              device.manufacturerName != null ? device.manufacturerName! : ''),
           trailing: ElevatedButton(
             child: Text(_device == device ? "Disconnect" : "Connect"),
             onPressed: () {
@@ -155,35 +159,36 @@ class _MyAppState extends State<Serial2> {
   @override
   Widget build(BuildContext context) {
     return Column(children: <Widget>[
-                Text(_ports.length > 0 ? "Available Serial Ports" : "No serial devices available"),
-                ..._ports,
-                Text('Status: $_status\n'),
-                Text('info: ${_port.toString()}\n'),
-                ListTile(
-                  title: TextField(
-                    controller: _textController,
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: 'Text To Send',
-                    ),
-                  ),
-                  trailing: ElevatedButton(
-                    child: Text("Send"),
-                    onPressed: _port == null
-                        ? null
-                        : () async {
-                      if (_port == null) {
-                        return;
-                      }
-                      String data = _textController.text + "\r\n";
-                      await _port!.write(Uint8List.fromList(data.codeUnits));
-                      _textController.text = "";
-                    },
-                  ),
-                ),
-                Text("Result Data"),
-                ..._serialData,
-              ]
-    );
+      Text(_ports.length > 0
+          ? "Available Serial Ports"
+          : "No serial devices available"),
+      ..._ports,
+      Text('Status: $_status\n'),
+      Text('info: ${_port.toString()}\n'),
+      ListTile(
+        title: TextField(
+          controller: _textController,
+          decoration: InputDecoration(
+            border: OutlineInputBorder(),
+            labelText: 'Text To Send',
+          ),
+        ),
+        trailing: ElevatedButton(
+          child: Text("Send"),
+          onPressed: _port == null
+              ? null
+              : () async {
+                  if (_port == null) {
+                    return;
+                  }
+                  String data = _textController.text + "\r\n";
+                  await _port!.write(Uint8List.fromList(data.codeUnits));
+                  _textController.text = "";
+                },
+        ),
+      ),
+      Text("Result Data"),
+      ..._serialData,
+    ]);
   }
 }

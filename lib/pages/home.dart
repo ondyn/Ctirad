@@ -1,3 +1,4 @@
+import 'package:ctirad/models/battery_provider.dart';
 import 'package:ctirad/pages/serial2.dart';
 import 'package:ctirad/stores/app.dart';
 import 'package:flutter/material.dart';
@@ -23,7 +24,7 @@ class _HomePageState extends State<HomePage> {
     AppModel store = Provider.of<AppModel>(context, listen: true);
 
     return DefaultTabController(
-      length: 4,
+      length: 5,
       child: Scaffold(
         appBar: PreferredSize(
           preferredSize: Size.fromHeight(70.0),
@@ -38,6 +39,7 @@ class _HomePageState extends State<HomePage> {
             ],
             bottom: const TabBar(
               tabs: [
+                Tab(icon: Icon(Icons.battery_std)),
                 Tab(icon: Icon(Icons.access_time)),
                 Tab(icon: Icon(Icons.directions_car)),
                 Tab(icon: Icon(Icons.wb_sunny_outlined)),
@@ -49,6 +51,10 @@ class _HomePageState extends State<HomePage> {
         ),
         body: TabBarView(
           children: [
+            Consumer<BatteryProvider>(builder: (context, provider, child) {
+              return Text(
+                  '${provider.batteryLevel}% status: ${provider.batteryState.toString().split('.').last}');
+            }),
             ClockPage(),
             Serial2(),
             Center(
