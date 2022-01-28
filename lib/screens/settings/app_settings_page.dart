@@ -14,6 +14,50 @@ class _AppSettingsState extends State<AppSettings> {
         title: 'Application Settings',
         children: [
           SettingsGroup(
+            title: 'Battery charging levels',
+            children: <Widget>[
+              SliderSettingsTile(
+                title: 'When to start charging',
+                settingKey: 'key-slider-batt-min',
+                min: 0,
+                max: 100,
+                leading: const Icon(Icons.battery_std),
+                decimalPrecision: 0,
+                onChange: (double value) {
+                  final double max =
+                      Settings.getValue<double>('key-slider-batt-max', 100.0);
+                  debugPrint('\n===== on change MIN =====\n'
+                      'key-slider-batt-min: $value key-slider-batt-max: $max');
+                  if (value >= max) {
+                    debugPrint('setting: key-slider-batt-min: ${max - 1}');
+                    Settings.setValue('key-slider-batt-min', max - 1,
+                        notify: true);
+                  }
+                  debugPrint('\n==========\n');
+                },
+              ),
+              SliderSettingsTile(
+                title: 'When to stop charging',
+                settingKey: 'key-slider-batt-max',
+                min: 0,
+                max: 100,
+                leading: const Icon(Icons.battery_std),
+                decimalPrecision: 0,
+                onChange: (double value) {
+                  debugPrint('\n===== on change MAX =====\n'
+                      'key-slider-batt-max: $value'
+                      '\n==========\n');
+                  final double min =
+                      Settings.getValue<double>('key-slider-batt-min', 0.0);
+                  if (value <= min) {
+                    Settings.setValue('key-slider-batt-max', min + 1,
+                        notify: true);
+                  }
+                },
+              ),
+            ],
+          ),
+          SettingsGroup(
             title: 'Single Choice Settings',
             children: <Widget>[
               SwitchSettingsTile(
