@@ -1,46 +1,45 @@
-import 'package:ctirad/pages/home.dart';
-import 'package:ctirad/pages/settings.dart';
-import 'package:ctirad/pages/settings/setting_baudrate.dart';
-import 'package:ctirad/stores/app.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'models/battery_provider.dart';
-import 'pages/settings/setting_device.dart';
+import 'package:flutter_settings_screens/flutter_settings_screens.dart';
 import 'package:provider/provider.dart';
 
+import 'models/battery_provider.dart';
+import 'models/cache_provider.dart';
+import 'models/tab_manager.dart';
+import 'screens/home_page.dart';
+
 void main() {
-  runApp(
-    ChangeNotifierProvider<AppModel>(
-      create: (context) => AppModel(),
-      child: MyApp(),
-    ),
+  initSettings().then((_) {
+    runApp(const Ctirad());
+  });
+}
+
+Future<void> initSettings() async {
+  await Settings.init(
+    cacheProvider: HiveCache(),
   );
 }
 
-class MyApp extends StatefulWidget {
-  @override
-  _MyAppState createState() => _MyAppState();
-}
+class Ctirad extends StatelessWidget {
+  const Ctirad({Key? key}) : super(key: key);
 
-class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     //full screen
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
     return MaterialApp(
       title: 'Ctirad',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData.dark(),
       home: MultiProvider(
         providers: [
-          ChangeNotifierProvider(create: (context) => BatteryProvider()),
+          ChangeNotifierProvider<BatteryProvider>(
+              create: (BuildContext context) => BatteryProvider()),
+          ChangeNotifierProvider<TabManager>(
+              create: (BuildContext context) => TabManager())
         ],
-        child: HomePage(),
+        child: const HomePage(),
       ),
-      routes: {
-        "/setting": (context) => SettingPage(),
-        "/setting/device": (context) => SettingDevicePage(),
-        "/setting/baudrate": (context) => SettingBaudratePage(),
-      },
     );
   }
 }

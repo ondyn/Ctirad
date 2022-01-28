@@ -1,31 +1,34 @@
 import 'dart:async';
 import 'dart:typed_data';
 
-import 'package:ctirad/stores/app.dart';
+import 'package:convert/convert.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:usb_serial/transaction.dart';
 import 'package:usb_serial/usb_serial.dart';
-import 'package:convert/convert.dart';
-import '../utils.dart';
+
+import '../api/utils.dart';
+import '../models/app.dart';
 
 class Serial2 extends StatefulWidget {
+  const Serial2({Key? key}) : super(key: key);
+
   @override
   _MyAppState createState() => _MyAppState();
 }
 
 class _MyAppState extends State<Serial2> {
   UsbPort? _port;
-  String _status = "Idle";
-  List<Widget> _ports = [];
-  List<Widget> _serialData = [];
+  String _status = 'Idle';
+  List<Widget> _ports = List<Widget>.empty();
+  final List<Widget> _serialData = List<Widget>.empty();
   bool isHexMode = true;
 
   StreamSubscription<Uint8List>? _subscription;
   Transaction<Uint8List>? _transaction;
   UsbDevice? _device;
 
-  TextEditingController _textController = TextEditingController();
+  final TextEditingController _textController = TextEditingController();
 
   Future<bool> _connectTo(device) async {
     _serialData.clear();
@@ -48,7 +51,7 @@ class _MyAppState extends State<Serial2> {
     if (device == null) {
       _device = null;
       setState(() {
-        _status = "Disconnected";
+        _status = 'Disconnected';
       });
       return true;
     }
@@ -56,7 +59,7 @@ class _MyAppState extends State<Serial2> {
     _port = await device.create();
     if (await (_port!.open()) != true) {
       setState(() {
-        _status = "Failed to open port";
+        _status = 'Failed to open port';
       });
       return false;
     }
@@ -71,11 +74,11 @@ class _MyAppState extends State<Serial2> {
         _port!.inputStream as Stream<Uint8List>,
         Uint8List.fromList([0xBE, 0xEF]));
 
-    _subscription = _transaction!.stream.listen((line) {
+    _subscription = _transaction!.stream.listen((Uint8List line) {
       setState(() {
         String recvData = hex.encode(line);
         _serialData.add(Text(recvData));
-        print("Receive: $line text: ${recvData}");
+        print('Receive: $line text: ${recvData}');
 
         Provider.of<AppModel>(context, listen: false)
             .updateTemperature(line[2]);
@@ -87,34 +90,34 @@ class _MyAppState extends State<Serial2> {
     });
 
     setState(() {
-      _status = "Connected";
+      _status = 'Connected';
     });
     return true;
   }
 
-  void _getPorts() async {
-    _ports = [];
+  Future<void> _getPorts() async {
+    _ports = List<ListTile>.empty();
     List<UsbDevice> devices = await UsbSerial.listDevices();
     if (!devices.contains(_device)) {
       _connectTo(null);
     }
     print(devices);
 
-    devices.forEach((device) {
+    for (final UsbDevice device in devices) {
       _ports.add(ListTile(
-          leading: Icon(Icons.usb),
+          leading: const Icon(Icons.usb),
           title: Text(device.productName!),
           subtitle: Text(
               device.manufacturerName != null ? device.manufacturerName! : ''),
           trailing: ElevatedButton(
-            child: Text(_device == device ? "Disconnect" : "Connect"),
+            child: Text(_device == device ? 'Disconnect' : 'Connect'),
             onPressed: () {
-              _connectTo(_device == device ? null : device).then((res) {
+              _connectTo(_device == device ? null : device).then((bool res) {
                 _getPorts();
               });
             },
           )));
-    });
+    }
 
     setState(() {
       print(_ports);
@@ -124,7 +127,7 @@ class _MyAppState extends State<Serial2> {
   String formatReceivedData(recv) {
     if (isHexMode) {
       return recv
-          .map((List<int> char) => char.map((c) => intToHex(c)).join())
+          .map((List<int> char) => char.map((int c) => intToHex(c)).join())
           .join();
     } else {
       return recv.map((List<int> char) => String.fromCharCodes(char)).join();
@@ -160,8 +163,8 @@ class _MyAppState extends State<Serial2> {
   Widget build(BuildContext context) {
     return Column(children: <Widget>[
       Text(_ports.length > 0
-          ? "Available Serial Ports"
-          : "No serial devices available"),
+          ? 'Available Serial Ports'
+          : 'No serial devices available'),
       ..._ports,
       Text('Status: $_status\n'),
       Text('info: ${_port.toString()}\n'),
@@ -174,20 +177,20 @@ class _MyAppState extends State<Serial2> {
           ),
         ),
         trailing: ElevatedButton(
-          child: Text("Send"),
+          child: Text('Send'),
           onPressed: _port == null
               ? null
               : () async {
                   if (_port == null) {
                     return;
                   }
-                  String data = _textController.text + "\r\n";
+                  String data = _textController.text + '\r\n';
                   await _port!.write(Uint8List.fromList(data.codeUnits));
-                  _textController.text = "";
+                  _textController.text = '';
                 },
         ),
       ),
-      Text("Result Data"),
+      Text('Result Data'),
       ..._serialData,
     ]);
   }

@@ -1,18 +1,11 @@
-import 'package:battery_plus/battery_plus.dart';
-import 'package:flutter/material.dart';
 import 'dart:async';
 
+import 'package:battery_plus/battery_plus.dart';
+import 'package:flutter/material.dart';
+
 class BatteryProvider extends ChangeNotifier {
-  int _batteryLevel = -1;
-  BatteryState _batteryState = BatteryState.unknown;
-  final _battery = Battery();
-  late StreamSubscription<BatteryState> _batteryStateSubscription;
-
-  int get batteryLevel => _batteryLevel;
-  BatteryState get batteryState => _batteryState;
-
   BatteryProvider() {
-    const oneSec = Duration(seconds: 5);
+    const Duration oneSec = Duration(seconds: 5);
     Timer.periodic(oneSec, (Timer t) => getBattery());
     _batteryStateSubscription =
         _battery.onBatteryStateChanged.listen((BatteryState state) {
@@ -21,8 +14,15 @@ class BatteryProvider extends ChangeNotifier {
       notifyListeners();
     });
   }
+  int _batteryLevel = -1;
+  BatteryState _batteryState = BatteryState.unknown;
+  final Battery _battery = Battery();
+  late StreamSubscription<BatteryState> _batteryStateSubscription;
 
-  void getBattery() async {
+  int get batteryLevel => _batteryLevel;
+  BatteryState get batteryState => _batteryState;
+
+  Future<void> getBattery() async {
     _batteryLevel = await _battery.batteryLevel;
     notifyListeners();
   }
@@ -33,14 +33,3 @@ class BatteryProvider extends ChangeNotifier {
     super.dispose();
   }
 }
-
-// Instantiate it
-
-
-// Access current battery level
-// print(await battery.batteryLevel);
-
-// // Be informed when the state (full, charging, discharging) changes
-// battery.onBatteryStateChanged.listen((BatteryState state) {
-//   // Do something with new state
-// });

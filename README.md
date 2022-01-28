@@ -231,5 +231,23 @@ I saw about 3 bit errors at a same positive and negative voltage but its negligi
 
 Place a 0.1-µF capacitor near the V+ pin on the INA1x9-Q1. Additional capacitance may be required for applications with noisy supply voltages.
 
+# links
+https://www.ti.com/lit/ds/symlink/ina214.pdf?ts=1636621930308&ref_url=https%253A%252F%252Fwww.ti.com%252Fsitesearch%252Fdocs%252Funiversalsearch.tsp%253FlangPref%253Den-US%2526searchTerm%253DINA214%2526nr%253D209  
+https://github.com/muccc/WomoLIN
+https://conference.c3w.at/media/Camper_Easterhegg2019.pdf  
 
-https://www.ti.com/lit/ds/symlink/ina214.pdf?ts=1636621930308&ref_url=https%253A%252F%252Fwww.ti.com%252Fsitesearch%252Fdocs%252Funiversalsearch.tsp%253FlangPref%253Den-US%2526searchTerm%253DINA214%2526nr%253D209
+
+# USB  
+\+ červený  
+\- černý  
+D+ zelený  
+D- bílý  
+
+# Protocol
+header: 0xDE AD
+footer: 0xBE EF
+
+nebo CBOR, BSON
+
+
+

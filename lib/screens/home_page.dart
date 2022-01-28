@@ -1,11 +1,14 @@
-import 'package:ctirad/models/battery_provider.dart';
-import 'package:ctirad/pages/serial2.dart';
-import 'package:ctirad/stores/app.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
+import '../models/battery_provider.dart';
 import 'clock.dart';
+import 'serial2.dart';
+import 'settings/app_settings_page.dart';
 
 class HomePage extends StatefulWidget {
+  const HomePage({Key? key}) : super(key: key);
+
   @override
   State<HomePage> createState() => _HomePageState();
 }
@@ -21,19 +24,17 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    AppModel store = Provider.of<AppModel>(context, listen: true);
-
     return DefaultTabController(
       length: 5,
       child: Scaffold(
         appBar: PreferredSize(
-          preferredSize: Size.fromHeight(70.0),
+          preferredSize: const Size.fromHeight(100.0),
           child: AppBar(
             actions: <Widget>[
               IconButton(
                 icon: const Icon(Icons.settings),
                 onPressed: () {
-                  Navigator.of(context).pushNamed("/setting");
+                  openAppSettings(context);
                 },
               ),
             ],
@@ -46,21 +47,22 @@ class _HomePageState extends State<HomePage> {
                 Tab(icon: Icon(Icons.device_thermostat)),
               ],
             ),
-            title: Text('Ctirad'),
+            title: const Text('Ctirad'),
           ),
         ),
         body: TabBarView(
           children: [
-            Consumer<BatteryProvider>(builder: (context, provider, child) {
+            Consumer<BatteryProvider>(builder: (BuildContext context,
+                BatteryProvider provider, Widget? child) {
               return Text(
                   '${provider.batteryLevel}% status: ${provider.batteryState.toString().split('.').last}');
             }),
             ClockPage(),
-            Serial2(),
+            const Serial2(),
             Center(
               child: Column(
-                children: [
-                  Text('${store.temperature}'),
+                children: const [
+                  Text('ahoj'),
                 ],
               ),
             ),
@@ -75,10 +77,10 @@ class _HomePageState extends State<HomePage> {
                     '$_counter',
                     style: Theme.of(context).textTheme.headline4,
                   ),
-                  Text('${store.baudrate}'),
+                  const Text('baudrate'),
                   OutlinedButton(
                     onPressed: _incrementCounter,
-                    child: Text('TextButton'),
+                    child: const Text('TextButton'),
                   )
                 ],
               ),
@@ -87,5 +89,11 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
     );
+  }
+
+  void openAppSettings(BuildContext context) {
+    Navigator.of(context).push(MaterialPageRoute(
+      builder: (BuildContext context) => AppSettings(),
+    ));
   }
 }
