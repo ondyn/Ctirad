@@ -9,7 +9,7 @@ import 'package:path_provider/path_provider.dart';
 /// A cache access provider class for shared preferences using Hive library
 class HiveCache extends CacheProvider {
   late Box _preferences;
-  final String keyName = 'app_preferences';
+  static const String keyName = 'app_settings';
 
   @override
   Future<void> init() async {

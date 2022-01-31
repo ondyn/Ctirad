@@ -1,3 +1,4 @@
+import 'package:ctirad/screens/battery_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -52,11 +53,7 @@ class _HomePageState extends State<HomePage> {
         ),
         body: TabBarView(
           children: [
-            Consumer<BatteryProvider>(builder: (BuildContext context,
-                BatteryProvider provider, Widget? child) {
-              return Text(
-                  '${provider.batteryLevel}% status: ${provider.batteryState.toString().split('.').last}');
-            }),
+            BatteryScreen(),
             ClockPage(),
             const Serial2(),
             Center(

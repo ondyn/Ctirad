@@ -44,6 +44,7 @@ dependencies:
   shared_preferences: ^2.0.12
   flutter_settings_screens: ^0.3.2-null-safety
   hive: ^2.0.5
+  hive_flutter: ^1.1.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

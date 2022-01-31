@@ -21,7 +21,7 @@ class _MyAppState extends State<Serial2> {
   UsbPort? _port;
   String _status = 'Idle';
   List<Widget> _ports = List<Widget>.empty();
-  final List<Widget> _serialData = List<Widget>.empty();
+  List<Widget> _serialData = [];
   bool isHexMode = true;
 
   StreamSubscription<Uint8List>? _subscription;

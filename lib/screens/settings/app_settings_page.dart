@@ -4,6 +4,9 @@ import 'package:flutter_settings_screens/flutter_settings_screens.dart';
 class AppSettings extends StatefulWidget {
   @override
   _AppSettingsState createState() => _AppSettingsState();
+
+  static const String batMax = 'key-slider-batt-max';
+  static const String batMin = 'key-slider-batt-min';
 }
 
 class _AppSettingsState extends State<AppSettings> {
@@ -18,19 +21,21 @@ class _AppSettingsState extends State<AppSettings> {
             children: <Widget>[
               SliderSettingsTile(
                 title: 'When to start charging',
-                settingKey: 'key-slider-batt-min',
+                settingKey: AppSettings.batMin,
                 min: 0,
                 max: 100,
+                defaultValue: 20,
                 leading: const Icon(Icons.battery_std),
                 decimalPrecision: 0,
                 onChange: (double value) {
                   final double max =
-                      Settings.getValue<double>('key-slider-batt-max', 100.0);
+                      Settings.getValue<double>(AppSettings.batMax, 100.0);
                   debugPrint('\n===== on change MIN =====\n'
                       'key-slider-batt-min: $value key-slider-batt-max: $max');
                   if (value >= max) {
                     debugPrint('setting: key-slider-batt-min: ${max - 1}');
-                    Settings.setValue('key-slider-batt-min', max - 1,
+                    Settings.setValue(
+                        AppSettings.batMin, (max - 1) < 0 ? 0 : max - 1,
                         notify: true);
                   }
                   debugPrint('\n==========\n');
@@ -38,9 +43,10 @@ class _AppSettingsState extends State<AppSettings> {
               ),
               SliderSettingsTile(
                 title: 'When to stop charging',
-                settingKey: 'key-slider-batt-max',
+                settingKey: AppSettings.batMax,
                 min: 0,
                 max: 100,
+                defaultValue: 80,
                 leading: const Icon(Icons.battery_std),
                 decimalPrecision: 0,
                 onChange: (double value) {
@@ -48,9 +54,10 @@ class _AppSettingsState extends State<AppSettings> {
                       'key-slider-batt-max: $value'
                       '\n==========\n');
                   final double min =
-                      Settings.getValue<double>('key-slider-batt-min', 0.0);
+                      Settings.getValue<double>(AppSettings.batMin, 0.0);
                   if (value <= min) {
-                    Settings.setValue('key-slider-batt-max', min + 1,
+                    Settings.setValue(
+                        AppSettings.batMax, (min + 1) > 100 ? 100 : min + 1,
                         notify: true);
                   }
                 },
