@@ -24,7 +24,7 @@ extension IntToString on int {
 }
 
 class _Serial extends State<Serial> {
-  var availablePorts = [];
+  List availablePorts = [];
 
   @override
   void initState() {
@@ -47,8 +47,8 @@ class _Serial extends State<Serial> {
           child: ListView(
             children: [
               for (final address in availablePorts)
-                Builder(builder: (context) {
-                  final port = SerialPort(address);
+                Builder(builder: (BuildContext context) {
+                  final SerialPort port = SerialPort(address);
                   return ExpansionTile(
                     title: Text(address),
                     children: [
@@ -69,8 +69,8 @@ class _Serial extends State<Serial> {
           ),
         ),
         floatingActionButton: FloatingActionButton(
-          child: Icon(Icons.refresh),
           onPressed: initPorts,
+          child: const Icon(Icons.refresh),
         ),
       ),
     );
@@ -81,7 +81,7 @@ class CardListTile extends StatelessWidget {
   final String name;
   final String? value;
 
-  CardListTile(this.name, this.value);
+  const CardListTile(this.name, this.value);
 
   @override
   Widget build(BuildContext context) {

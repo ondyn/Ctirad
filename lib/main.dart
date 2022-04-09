@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'models/battery_provider.dart';
 import 'models/cache_provider.dart';
 import 'models/tab_manager.dart';
+import 'models/time_provider.dart';
 import 'screens/home_page.dart';
 
 void main() {
@@ -36,7 +37,9 @@ class Ctirad extends StatelessWidget {
           ChangeNotifierProvider<BatteryProvider>(
               create: (BuildContext context) => BatteryProvider()),
           ChangeNotifierProvider<TabManager>(
-              create: (BuildContext context) => TabManager())
+              create: (BuildContext context) => TabManager()),
+          ChangeNotifierProvider<TimeProvider>(
+              create: (BuildContext context) => TimeProvider()),
         ],
         child: const HomePage(),
       ),

@@ -21,7 +21,7 @@ class _MyAppState extends State<Serial2> {
   UsbPort? _port;
   String _status = 'Idle';
   List<Widget> _ports = List<Widget>.empty();
-  List<Widget> _serialData = [];
+  final List<Widget> _serialData = [];
   bool isHexMode = true;
 
   StreamSubscription<Uint8List>? _subscription;
@@ -57,7 +57,7 @@ class _MyAppState extends State<Serial2> {
     }
 
     _port = await device.create();
-    if (await (_port!.open()) != true) {
+    if (await _port!.open() != true) {
       setState(() {
         _status = 'Failed to open port';
       });
@@ -76,9 +76,9 @@ class _MyAppState extends State<Serial2> {
 
     _subscription = _transaction!.stream.listen((Uint8List line) {
       setState(() {
-        String recvData = hex.encode(line);
+        final String recvData = hex.encode(line);
         _serialData.add(Text(recvData));
-        print('Receive: $line text: ${recvData}');
+        print('Receive: $line text: $recvData');
 
         Provider.of<AppModel>(context, listen: false)
             .updateTemperature(line[2]);
@@ -97,7 +97,7 @@ class _MyAppState extends State<Serial2> {
 
   Future<void> _getPorts() async {
     _ports = List<ListTile>.empty();
-    List<UsbDevice> devices = await UsbSerial.listDevices();
+    final List<UsbDevice> devices = await UsbSerial.listDevices();
     if (!devices.contains(_device)) {
       _connectTo(null);
     }
@@ -162,7 +162,7 @@ class _MyAppState extends State<Serial2> {
   @override
   Widget build(BuildContext context) {
     return Column(children: <Widget>[
-      Text(_ports.length > 0
+      Text(_ports.isNotEmpty
           ? 'Available Serial Ports'
           : 'No serial devices available'),
       ..._ports,
@@ -171,26 +171,26 @@ class _MyAppState extends State<Serial2> {
       ListTile(
         title: TextField(
           controller: _textController,
-          decoration: InputDecoration(
+          decoration: const InputDecoration(
             border: OutlineInputBorder(),
             labelText: 'Text To Send',
           ),
         ),
         trailing: ElevatedButton(
-          child: Text('Send'),
           onPressed: _port == null
               ? null
               : () async {
                   if (_port == null) {
                     return;
                   }
-                  String data = _textController.text + '\r\n';
+                  final String data = '${_textController.text}\r\n';
                   await _port!.write(Uint8List.fromList(data.codeUnits));
                   _textController.text = '';
                 },
+          child: const Text('Send'),
         ),
       ),
-      Text('Result Data'),
+      const Text('Result Data'),
       ..._serialData,
     ]);
   }

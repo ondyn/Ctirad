@@ -1,9 +1,10 @@
-import 'package:ctirad/screens/battery_screen.dart';
+import 'package:battery_plus/battery_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../models/battery_provider.dart';
-import 'clock.dart';
+import 'battery_screen.dart';
+import 'clock_screen.dart';
 import 'serial2.dart';
 import 'settings/app_settings_page.dart';
 
@@ -32,6 +33,13 @@ class _HomePageState extends State<HomePage> {
           preferredSize: const Size.fromHeight(100.0),
           child: AppBar(
             actions: <Widget>[
+              Consumer<BatteryProvider>(builder: (BuildContext context,
+                  BatteryProvider provider, Widget? child) {
+                if (provider.batteryState == BatteryState.charging) {
+                  return const Icon(Icons.battery_charging_full);
+                }
+                return const SizedBox.shrink();
+              }),
               IconButton(
                 icon: const Icon(Icons.settings),
                 onPressed: () {
@@ -52,9 +60,9 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
         body: TabBarView(
-          children: [
-            BatteryScreen(),
-            ClockPage(),
+          children: <Widget>[
+            const BatteryScreen(),
+            const ClockScreen(),
             const Serial2(),
             Center(
               child: Column(

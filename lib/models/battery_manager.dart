@@ -20,8 +20,8 @@ class BatteryManager extends ChangeNotifier {
   static const String prefMaxChargingKey = 'maxCharging';
   int _minChargingLevel = 0;
   int _maxChargingLevel = 100;
-  BatteryState _batteryState = BatteryState.unknown;
-  final _battery = Battery();
+  final BatteryState _batteryState = BatteryState.unknown;
+  final Battery _battery = Battery();
   late StreamSubscription<BatteryState> _batteryStateSubscription;
 
   int get minChargingLevel => _minChargingLevel;

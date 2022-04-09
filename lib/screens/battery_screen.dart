@@ -24,7 +24,7 @@ class BatteryScreen extends StatelessWidget {
       }),
       ValueListenableBuilder<Box>(
           valueListenable: Hive.box(HiveCache.keyName).listenable(),
-          builder: (context, box, widget) {
+          builder: (BuildContext context, Box box, Widget? widget) {
             return Column(
               children: [
                 Center(

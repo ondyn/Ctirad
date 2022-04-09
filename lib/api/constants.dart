@@ -1,4 +1,4 @@
-List<int> kBaudrateList = [
+List<int> kBaudrateList = <int>[
   110,
   300,
   600,

@@ -1,9 +1,10 @@
 import 'dart:async';
 
 import 'package:battery_plus/battery_plus.dart';
-import 'package:ctirad/screens/settings/app_settings_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_screens/flutter_settings_screens.dart';
+
+import '../screens/settings/app_settings_page.dart';
 
 class BatteryProvider extends ChangeNotifier {
   BatteryProvider() {
@@ -36,8 +37,8 @@ class BatteryProvider extends ChangeNotifier {
   }
 
   void processBatteryLevel(int newLevel) {
-    double max = Settings.getValue<double>(AppSettings.batMax, 100.0);
-    double min = Settings.getValue<double>(AppSettings.batMin, 0.0);
+    final double max = Settings.getValue<double>(AppSettings.batMax, 100.0);
+    final double min = Settings.getValue<double>(AppSettings.batMin, 0.0);
     if (newLevel < min) {
       _charged = false;
       _chargeMe = false;

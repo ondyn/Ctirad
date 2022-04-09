@@ -8,11 +8,11 @@ class Device with ChangeNotifier {
   int age = 0;
 
   void increaseAge() {
-    this.age++;
+    age++;
     notifyListeners();
   }
 
   String get getName {
-    return this.name;
+    return name;
   }
 }

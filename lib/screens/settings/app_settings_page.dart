@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screen_wake/flutter_screen_wake.dart';
 import 'package:flutter_settings_screens/flutter_settings_screens.dart';
 
 class AppSettings extends StatefulWidget {
@@ -65,6 +66,23 @@ class _AppSettingsState extends State<AppSettings> {
             ],
           ),
           SettingsGroup(
+            title: 'Screen brightness',
+            children: <Widget>[
+              SliderSettingsTile(
+                title: 'Screen brightness',
+                settingKey: 'screen-brightness',
+                min: 0,
+                max: 1,
+                step: 0.1,
+                decimalPrecision: 1,
+                leading: const Icon(Icons.brightness_4_outlined),
+                onChange: (double value) {
+                  FlutterScreenWake.setBrightness(value);
+                },
+              )
+            ],
+          ),
+          SettingsGroup(
             title: 'Single Choice Settings',
             children: <Widget>[
               SwitchSettingsTile(
@@ -74,7 +92,7 @@ class _AppSettingsState extends State<AppSettings> {
                     'or internet via connecting to a W-Fi router',
                 enabledLabel: 'Enabled',
                 disabledLabel: 'Disabled',
-                leading: Icon(Icons.wifi),
+                leading: const Icon(Icons.wifi),
                 onChange: (bool value) {
                   debugPrint('key-wifi: $value');
                 },
@@ -86,13 +104,13 @@ class _AppSettingsState extends State<AppSettings> {
                     'near by bluetooth enabled devices',
                 enabledLabel: 'Enabled',
                 disabledLabel: 'Disabled',
-                leading: Icon(Icons.bluetooth),
+                leading: const Icon(Icons.bluetooth),
                 onChange: (bool value) {
                   debugPrint('key-blue-tooth: $value');
                 },
               ),
               SwitchSettingsTile(
-                leading: Icon(Icons.developer_mode),
+                leading: const Icon(Icons.developer_mode),
                 settingKey: 'key-switch-dev-mode',
                 title: 'Developer Settings',
                 onChange: (bool value) {
@@ -100,7 +118,7 @@ class _AppSettingsState extends State<AppSettings> {
                 },
                 childrenIfEnabled: <Widget>[
                   CheckboxSettingsTile(
-                    leading: Icon(Icons.adb),
+                    leading: const Icon(Icons.adb),
                     settingKey: 'key-is-developer',
                     title: 'Developer Mode',
                     defaultValue: true,
@@ -109,7 +127,7 @@ class _AppSettingsState extends State<AppSettings> {
                     },
                   ),
                   SwitchSettingsTile(
-                    leading: Icon(Icons.usb),
+                    leading: const Icon(Icons.usb),
                     settingKey: 'key-is-usb-debugging',
                     title: 'USB Debugging',
                     onChange: (bool value) {
@@ -135,7 +153,7 @@ class _AppSettingsState extends State<AppSettings> {
                   title: 'App Settings',
                   children: <Widget>[
                     CheckboxSettingsTile(
-                      leading: Icon(Icons.adb),
+                      leading: const Icon(Icons.adb),
                       settingKey: 'key-is-developer',
                       title: 'Developer Mode',
                       onChange: (bool value) {
@@ -143,7 +161,7 @@ class _AppSettingsState extends State<AppSettings> {
                       },
                     ),
                     SwitchSettingsTile(
-                      leading: Icon(Icons.usb),
+                      leading: const Icon(Icons.usb),
                       settingKey: 'key-is-usb-debugging',
                       title: 'USB Debugging',
                       onChange: (bool value) {
@@ -188,7 +206,7 @@ class _AppSettingsState extends State<AppSettings> {
                     title: 'Daylight Time Saving',
                     enabledLabel: 'Enabled',
                     disabledLabel: 'Disabled',
-                    leading: Icon(Icons.timelapse),
+                    leading: const Icon(Icons.timelapse),
                     onChange: (bool value) {
                       debugPrint('key-day-light-saving: $value');
                     },
@@ -198,7 +216,7 @@ class _AppSettingsState extends State<AppSettings> {
                     title: 'Dark Mode',
                     enabledLabel: 'Enabled',
                     disabledLabel: 'Disabled',
-                    leading: Icon(Icons.palette),
+                    leading: const Icon(Icons.palette),
                     onChange: (bool value) {
                       debugPrint('jey-dark-mode: $value');
                     },
@@ -215,7 +233,7 @@ class _AppSettingsState extends State<AppSettings> {
                     title: 'Daylight Time Saving',
                     enabledLabel: 'Enabled',
                     disabledLabel: 'Disabled',
-                    leading: Icon(Icons.timelapse),
+                    leading: const Icon(Icons.timelapse),
                     onChange: (bool value) {
                       debugPrint('key-day-light-savings-2: $value');
                     },
@@ -225,7 +243,7 @@ class _AppSettingsState extends State<AppSettings> {
                     title: 'Dark Mode',
                     enabledLabel: 'Enabled',
                     disabledLabel: 'Disabled',
-                    leading: Icon(Icons.palette),
+                    leading: const Icon(Icons.palette),
                     onChange: (bool value) {
                       debugPrint('key-dark-mode-2: $value');
                     },
@@ -354,14 +372,13 @@ class _AppSettingsState extends State<AppSettings> {
                 defaultValue: 20,
                 min: 0,
                 max: 100,
-                step: 1,
-                leading: Icon(Icons.volume_up),
+                leading: const Icon(Icons.volume_up),
                 decimalPrecision: 0,
                 onChange: (double value) {
                   debugPrint('\n===== on change end =====\n'
                       'key-slider-volume: $value'
                       '\n==========\n');
-                  Future.delayed(Duration(seconds: 1), () {
+                  Future.delayed(const Duration(seconds: 1), () {
                     Settings.setValue('key-slider-volume', 20.0, notify: true);
                   });
                 },
@@ -388,7 +405,7 @@ class _AppSettingsState extends State<AppSettings> {
                 max: 5,
                 step: 0.1,
                 decimalPrecision: 1,
-                leading: Icon(Icons.aspect_ratio),
+                leading: const Icon(Icons.aspect_ratio),
                 onChange: (double value) {
                   debugPrint('\n===== on change =====\n'
                       'key-custom-ratio-slider-2: $value'
