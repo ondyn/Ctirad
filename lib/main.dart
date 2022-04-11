@@ -5,11 +5,13 @@ import 'package:provider/provider.dart';
 
 import 'models/battery_provider.dart';
 import 'models/cache_provider.dart';
+import 'models/camera_provider.dart';
 import 'models/tab_manager.dart';
 import 'models/time_provider.dart';
 import 'screens/home_page.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   initSettings().then((_) {
     runApp(const Ctirad());
   });
@@ -28,6 +30,7 @@ class Ctirad extends StatelessWidget {
   Widget build(BuildContext context) {
     //full screen
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
+    final CameraProvider cameraProvider = CameraProvider();
     return MaterialApp(
       title: 'Ctirad',
       debugShowCheckedModeBanner: false,
@@ -40,6 +43,9 @@ class Ctirad extends StatelessWidget {
               create: (BuildContext context) => TabManager()),
           ChangeNotifierProvider<TimeProvider>(
               create: (BuildContext context) => TimeProvider()),
+          // ChangeNotifierProvider<CameraProvider>(
+          //     create: (BuildContext context) => CameraProvider()),
+          ChangeNotifierProvider<CameraProvider>.value(value: cameraProvider)
         ],
         child: const HomePage(),
       ),

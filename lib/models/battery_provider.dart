@@ -8,8 +8,9 @@ import '../screens/settings/app_settings_page.dart';
 
 class BatteryProvider extends ChangeNotifier {
   BatteryProvider() {
-    const Duration oneSec = Duration(seconds: 5);
-    Timer.periodic(oneSec, (Timer t) => checkBattery());
+    checkBattery();
+    const Duration period = Duration(seconds: 5);
+    Timer.periodic(period, (Timer t) => checkBattery());
     _batteryStateSubscription =
         _battery.onBatteryStateChanged.listen((BatteryState state) {
       debugPrint(
@@ -31,9 +32,12 @@ class BatteryProvider extends ChangeNotifier {
   bool get chargeMe => _chargeMe;
 
   Future<void> checkBattery() async {
-    _batteryLevel = await _battery.batteryLevel;
-    processBatteryLevel(_batteryLevel);
-    notifyListeners();
+    final int newBatteryLevel = await _battery.batteryLevel;
+    if (newBatteryLevel != _batteryLevel) {
+      _batteryLevel = newBatteryLevel;
+      processBatteryLevel(_batteryLevel);
+      notifyListeners();
+    }
   }
 
   void processBatteryLevel(int newLevel) {
@@ -56,7 +60,7 @@ class BatteryProvider extends ChangeNotifier {
     }
 
     debugPrint(
-        'newLevel:$newLevel, min:$min, max$max, chargeMe:$_chargeMe, charged:$_charged');
+        'battery: newLevel:$newLevel, min:$min, max$max, chargeMe:$_chargeMe, charged:$_charged');
   }
 
   @override

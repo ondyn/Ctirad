@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../models/battery_provider.dart';
 import 'battery_screen.dart';
+import 'camera_screen.dart';
 import 'clock_screen.dart';
 import 'serial2.dart';
 import 'settings/app_settings_page.dart';
@@ -27,7 +28,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 5,
+      length: 6,
       child: Scaffold(
         appBar: PreferredSize(
           preferredSize: const Size.fromHeight(100.0),
@@ -48,12 +49,13 @@ class _HomePageState extends State<HomePage> {
               ),
             ],
             bottom: const TabBar(
-              tabs: [
+              tabs: <Tab>[
                 Tab(icon: Icon(Icons.battery_std)),
                 Tab(icon: Icon(Icons.access_time)),
                 Tab(icon: Icon(Icons.directions_car)),
                 Tab(icon: Icon(Icons.wb_sunny_outlined)),
                 Tab(icon: Icon(Icons.device_thermostat)),
+                Tab(icon: Icon(Icons.camera_alt)),
               ],
             ),
             title: const Text('Ctirad'),
@@ -66,7 +68,7 @@ class _HomePageState extends State<HomePage> {
             const Serial2(),
             Center(
               child: Column(
-                children: const [
+                children: const <Text>[
                   Text('ahoj'),
                 ],
               ),
@@ -90,6 +92,7 @@ class _HomePageState extends State<HomePage> {
                 ],
               ),
             ),
+            const CameraScreen(),
           ],
         ),
       ),

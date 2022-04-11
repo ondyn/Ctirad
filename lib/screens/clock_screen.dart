@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 import '../models/time_provider.dart';
+import 'animation_screen.dart';
 
 class ClockScreen extends StatelessWidget {
   const ClockScreen({Key? key}) : super(key: key);
@@ -28,11 +29,17 @@ class ClockScreen extends StatelessWidget {
           ),
           Text(
             provider.formattedDate,
-            style: const TextStyle(
+            style: GoogleFonts.supermercadoOne(
+              textStyle: Theme.of(context).textTheme.bodyText1,
               fontWeight: FontWeight.w300,
               fontSize: 50,
             ),
           ),
+          Container(
+              width: 800.0,
+              height: 500.0,
+              color: Colors.red,
+              child: SampleAnimation(text: provider.formattedTime)),
         ],
       );
     });
