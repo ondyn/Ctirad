@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:battery_plus/battery_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -16,8 +18,13 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage>
+    with SingleTickerProviderStateMixin {
+  bool _screenSaver = false;
   int _counter = 0;
+  var _context;
+  late TabController _tabController;
+  late Timer _timer;
 
   void _incrementCounter() {
     setState(() {
@@ -25,11 +32,51 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  void _stopScreenSaver() {
+    setState(() {
+      _screenSaver = false;
+    });
+  }
+
+  void _startScreenSaver() {
+    print(
+        'starting screen saver...........................................................................');
+    setState(() {
+      _screenSaver = true;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(vsync: this, length: 6);
+
+    _tabController.addListener(_handleTabSelection);
+    _handleTabSelection();
+  }
+
+  void _handleTabSelection() {
+    if (!_tabController.indexIsChanging) {
+      print(_tabController.index);
+      if (_tabController.index == 0) {
+        _timer = Timer(Duration(milliseconds: 10000), _startScreenSaver);
+      } else {
+        _timer.cancel();
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 6,
-      child: Scaffold(
+    if (_screenSaver) {
+      return GestureDetector(
+          onTap: () {
+            _stopScreenSaver();
+            _handleTabSelection();
+          },
+          child: SizedBox.expand(child: ClockScreen()));
+    } else {
+      return Scaffold(
         appBar: PreferredSize(
           preferredSize: const Size.fromHeight(100.0),
           child: AppBar(
@@ -48,10 +95,11 @@ class _HomePageState extends State<HomePage> {
                 },
               ),
             ],
-            bottom: const TabBar(
+            bottom: TabBar(
+              controller: _tabController,
               tabs: <Tab>[
-                Tab(icon: Icon(Icons.battery_std)),
                 Tab(icon: Icon(Icons.access_time)),
+                Tab(icon: Icon(Icons.battery_std)),
                 Tab(icon: Icon(Icons.directions_car)),
                 Tab(icon: Icon(Icons.wb_sunny_outlined)),
                 Tab(icon: Icon(Icons.device_thermostat)),
@@ -61,42 +109,53 @@ class _HomePageState extends State<HomePage> {
             title: const Text('Ctirad'),
           ),
         ),
-        body: TabBarView(
-          children: <Widget>[
-            const BatteryScreen(),
-            const ClockScreen(),
-            const Serial2(),
-            Center(
-              child: Column(
-                children: const <Text>[
-                  Text('ahoj'),
-                ],
+        body: Builder(builder: (context) {
+          _context = context;
+          return TabBarView(
+            controller: _tabController,
+            children: <Widget>[
+              const ClockScreen(),
+              const BatteryScreen(),
+              const Serial2(),
+              Center(
+                child: Column(
+                  children: const <Text>[
+                    Text('ahoj'),
+                  ],
+                ),
               ),
-            ),
-            Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  const Text(
-                    'You have pushed the button this many times:',
-                  ),
-                  Text(
-                    '$_counter',
-                    style: Theme.of(context).textTheme.headline4,
-                  ),
-                  const Text('baudrate'),
-                  OutlinedButton(
-                    onPressed: _incrementCounter,
-                    child: const Text('TextButton'),
-                  )
-                ],
+              Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    const Text(
+                      'You have pushed the button this many times:',
+                    ),
+                    Text(
+                      '$_counter',
+                      style: Theme.of(context).textTheme.headline4,
+                    ),
+                    const Text('baudrate'),
+                    OutlinedButton(
+                      onPressed: _incrementCounter,
+                      child: const Text('TextButton'),
+                    )
+                  ],
+                ),
               ),
-            ),
-            const CameraScreen(),
-          ],
-        ),
-      ),
-    );
+              const CameraScreen(),
+            ],
+          );
+        }),
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    _timer.cancel();
+    super.dispose();
   }
 
   void openAppSettings(BuildContext context) {

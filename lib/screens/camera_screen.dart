@@ -15,7 +15,8 @@ class CameraScreen extends StatelessWidget {
         return Column(
           children: [
             Text('${provider.cameras.length} cameras'),
-            if (provider.image != null) Image.file(File(provider.image!.path)),
+            // if (provider.image != null) Image.file(File(provider.image!.path)),
+            provider.cameraPreview,
           ],
         );
       }),
