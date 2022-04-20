@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class SampleAnimation extends StatefulWidget {
   final String text;
@@ -36,10 +37,14 @@ class SampleAnimationState extends State<SampleAnimation>
     return Stack(
       children: <Widget>[
         Positioned(
-          top: calculate(_animation.value).dy,
-          left: calculate(_animation.value).dx,
-          child: Text(widget.text),
-        ),
+            top: calculate(_animation.value).dy,
+            left: calculate(_animation.value).dx,
+            child: Text(
+              widget.text,
+              style: GoogleFonts.supermercadoOne(
+                  textStyle: Theme.of(context).textTheme.bodyText1,
+                  fontWeight: FontWeight.bold),
+            )),
       ],
     );
   }

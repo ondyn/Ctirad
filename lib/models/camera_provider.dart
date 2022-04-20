@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:ffi';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:camera/camera.dart';
 import 'package:exif/exif.dart';
@@ -43,21 +44,17 @@ class CameraProvider extends ChangeNotifier {
       ResolutionPreset.max,
     );
     await _controller.initialize();
-    debugPrint('camera init done');
     const Duration period = Duration(seconds: 5);
     Timer.periodic(period, (Timer t) => getImage());
   }
 
   Future<void> getImage() async {
     try {
-      debugPrint('getImage...');
       image = await _controller.takePicture();
       final File file = File(image!.path);
 
-      final fileBytes = file.readAsBytesSync();
-      final data = await readExifFromBytes(fileBytes);
-
-      debugPrint('image path: ${image!.path}');
+      final Uint8List fileBytes = file.readAsBytesSync();
+      final Map<String, IfdTag> data = await readExifFromBytes(fileBytes);
       // /data/user/0/com.example.ctirad/cache/CAP8082876847936089632.jpg
       if (data.isEmpty) {
         print("No EXIF information found");
@@ -67,7 +64,6 @@ class CameraProvider extends ChangeNotifier {
       final String exposureFraction = data['EXIF ExposureTime'].toString();
       try {
         final splitted = exposureFraction.split('/');
-        print(splitted);
         final double expTime = int.parse(splitted[0]) / int.parse(splitted[1]);
         final double brightness = 1 - expTime * 10;
         FlutterScreenWake.setBrightness(brightness);
@@ -76,7 +72,7 @@ class CameraProvider extends ChangeNotifier {
         print('unable to parse exposure time: $exposureFraction');
       }
 
-      if (data.containsKey('EXIF ExposureTime')) {
+/*       if (data.containsKey('EXIF ExposureTime')) {
         print('ExposureTime: ${data['EXIF ExposureTime']}');
       }
       if (data.containsKey('EXIF FNumber')) {
@@ -84,7 +80,7 @@ class CameraProvider extends ChangeNotifier {
       }
       if (data.containsKey('EXIF ISOSpeedRatings')) {
         print('ISOSpeedRatings: ${data['EXIF ISOSpeedRatings']}');
-      }
+      } */
 
       // for (final entry in data.entries) {
       //   print("${entry.key}: ${entry.value}");

@@ -22,7 +22,6 @@ class _HomePageState extends State<HomePage>
     with SingleTickerProviderStateMixin {
   bool _screenSaver = false;
   int _counter = 0;
-  var _context;
   late TabController _tabController;
   late Timer _timer;
 
@@ -39,8 +38,6 @@ class _HomePageState extends State<HomePage>
   }
 
   void _startScreenSaver() {
-    print(
-        'starting screen saver...........................................................................');
     setState(() {
       _screenSaver = true;
     });
@@ -57,9 +54,8 @@ class _HomePageState extends State<HomePage>
 
   void _handleTabSelection() {
     if (!_tabController.indexIsChanging) {
-      print(_tabController.index);
       if (_tabController.index == 0) {
-        _timer = Timer(Duration(milliseconds: 10000), _startScreenSaver);
+        _timer = Timer(const Duration(milliseconds: 10000), _startScreenSaver);
       } else {
         _timer.cancel();
       }
@@ -74,7 +70,7 @@ class _HomePageState extends State<HomePage>
             _stopScreenSaver();
             _handleTabSelection();
           },
-          child: SizedBox.expand(child: ClockScreen()));
+          child: const SizedBox.expand(child: ClockScreen()));
     } else {
       return Scaffold(
         appBar: PreferredSize(
@@ -97,7 +93,7 @@ class _HomePageState extends State<HomePage>
             ],
             bottom: TabBar(
               controller: _tabController,
-              tabs: <Tab>[
+              tabs: const <Tab>[
                 Tab(icon: Icon(Icons.access_time)),
                 Tab(icon: Icon(Icons.battery_std)),
                 Tab(icon: Icon(Icons.directions_car)),
@@ -109,8 +105,7 @@ class _HomePageState extends State<HomePage>
             title: const Text('Ctirad'),
           ),
         ),
-        body: Builder(builder: (context) {
-          _context = context;
+        body: Builder(builder: (BuildContext context) {
           return TabBarView(
             controller: _tabController,
             children: <Widget>[
