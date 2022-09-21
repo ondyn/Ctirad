@@ -249,5 +249,9 @@ footer: 0xBE EF
 
 nebo CBOR, BSON
 
-
+# Rozvaděč
+- elektronické pojistky
+- mosfet switching
+- remote on/off
+- monitoring: pojistky, nabíjení externí, solar, low power warning, sběrnicové moduly(svorky)
 
