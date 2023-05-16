@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"name": "ctirad-ui",
+			"path": "ctirad-ui"
+		},
+		{
+			"name": "ctirad-hub",
+			"path": "ctirad-hub"
+		}
+	],
+	"settings": {}
+}
