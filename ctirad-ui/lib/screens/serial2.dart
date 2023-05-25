@@ -50,9 +50,11 @@ class _MyAppState extends State<Serial2> {
 
     if (device == null) {
       _device = null;
-      setState(() {
-        _status = 'Disconnected';
-      });
+      if (this.mounted) {
+        setState(() {
+          _status = 'Disconnected';
+        });
+      }
       return true;
     }
 
@@ -155,8 +157,8 @@ class _MyAppState extends State<Serial2> {
 
   @override
   void dispose() {
-    super.dispose();
     _connectTo(null);
+    super.dispose();
   }
 
   @override

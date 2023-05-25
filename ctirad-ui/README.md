@@ -14,3 +14,6 @@ A few resources to get you started if this is your first Flutter project:
 For help getting started with Flutter development, view the
 [online documentation](https://docs.flutter.dev/), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
+
+# device
+Umax VisionBook 8C LTE Tablet - displej 8" mdpi HD 1280 × 800 IPS, Unicos SC9863 1,6 GHz, RAM 2 GB, interní paměť 32 GB, paměťová karta až 125 GB, WiFi, Bluetooth, GPS, 4G/LTE, zadní fotoaparát 5 Mpx, přední fotoaparát 2 Mpx, Micro SIM, USB-C, Android 10

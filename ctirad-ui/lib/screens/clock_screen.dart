@@ -16,30 +16,32 @@ class ClockScreen extends StatelessWidget {
         children: <Widget>[
           Expanded(
             child: FittedBox(
-                fit: BoxFit.fitWidth,
+                // fit: BoxFit.fitWidth,
                 child: Container(
-                  margin: const EdgeInsets.all(0.5),
-                  child: Text(
-                    provider.formattedTime,
-                    style: GoogleFonts.supermercadoOne(
-                        textStyle: Theme.of(context).textTheme.bodyText1,
-                        fontWeight: FontWeight.bold),
-                  ),
-                )),
+              margin: const EdgeInsets.all(0.5),
+              child: Text(
+                provider.formattedTime,
+                style: GoogleFonts.supermercadoOne(
+                    textStyle: Theme.of(context).textTheme.bodyLarge,
+                    fontWeight: FontWeight.bold),
+              ),
+            )),
           ),
           Text(
             provider.formattedDate,
             style: GoogleFonts.supermercadoOne(
-              textStyle: Theme.of(context).textTheme.bodyText1,
+              textStyle: Theme.of(context).textTheme.bodyLarge,
               fontWeight: FontWeight.w300,
               fontSize: 50,
             ),
           ),
-          Container(
-              width: 800.0,
-              height: 500.0,
-              color: Colors.red,
-              child: SampleAnimation(text: provider.formattedTime)),
+          // Expanded(
+          //     // width: 800.0,
+          //     // height: 500.0,
+          //     // color: Colors.red,
+          //     child: SampleAnimation(
+          //         line1: provider.formattedTime,
+          //         line2: provider.formattedDate)),
         ],
       );
     });

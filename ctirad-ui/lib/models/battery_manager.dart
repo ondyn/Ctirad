@@ -4,8 +4,8 @@ import 'package:battery_plus/battery_plus.dart';
 import 'package:flutter/material.dart';
 import 'shared_preferences.dart';
 
-class BatteryManager extends ChangeNotifier {
-  BatteryManager() {
+class XXBatteryManager extends ChangeNotifier {
+  XXBatteryManager() {
     restoreSharedPreferences(prefMinChargingKey).then((dynamic value) {
       _minChargingLevel = value;
       notifyListeners();

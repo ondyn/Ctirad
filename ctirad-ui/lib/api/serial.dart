@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:usb_serial/transaction.dart';
 import 'package:usb_serial/usb_serial.dart';
 
-class Name extends ChangeNotifier {
+class xxName extends ChangeNotifier {
   late UsbPort? _port;
   final String _status = 'Idle';
   final List<Widget> _ports = <Widget>[];

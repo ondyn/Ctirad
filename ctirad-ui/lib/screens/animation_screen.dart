@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class SampleAnimation extends StatefulWidget {
-  final String text;
-  const SampleAnimation({Key? key, required this.text}) : super(key: key);
+  final String line1;
+  final String line2;
+  const SampleAnimation({Key? key, required this.line1, required this.line2})
+      : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
@@ -39,11 +41,25 @@ class SampleAnimationState extends State<SampleAnimation>
         Positioned(
             top: calculate(_animation.value).dy,
             left: calculate(_animation.value).dx,
-            child: Text(
-              widget.text,
-              style: GoogleFonts.supermercadoOne(
-                  textStyle: Theme.of(context).textTheme.bodyText1,
-                  fontWeight: FontWeight.bold),
+            width: 800.0,
+            height: 500.0,
+            child: Column(
+              children: [
+                Expanded(
+                  child: Text(
+                    widget.line1,
+                    style: GoogleFonts.supermercadoOne(
+                        textStyle: Theme.of(context).textTheme.bodyLarge,
+                        fontWeight: FontWeight.bold),
+                  ),
+                ),
+                Text(
+                  widget.line2,
+                  style: GoogleFonts.supermercadoOne(
+                      textStyle: Theme.of(context).textTheme.bodyLarge,
+                      fontWeight: FontWeight.bold),
+                ),
+              ],
             )),
       ],
     );
