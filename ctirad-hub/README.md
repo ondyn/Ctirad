@@ -87,7 +87,7 @@ Pin 6: + Sensor WB růžová
 Pin 7: SB(starter batt) modrá
 Pin 8: Pump
 Pin 9: Light
-Pin10: AUX
+Pin10: AUX 
 
 
 electroblock
