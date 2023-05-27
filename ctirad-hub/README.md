@@ -8,22 +8,14 @@ vs code - install fullter extension
 android studio - install cmd line tools
 flutter - setup path
 
-# serial protocol
-header: 0xDEED
-footer: 0XBEEF
-
-tablet - Arduino
-
--> start/stop charging
-
-
-
 # data
 - vnitřní teplota
 - vnější teplota
+- vnitřní vlhkost
+- venkovní vlhkost
 - teplota v lednici
 - teplota v odpadní nádrži
-- GPS tracker
+- GPS
 - ovládání topení/ventilace
 - ovládání ventilátoru
 - pohybový alarm- kamera
@@ -31,9 +23,9 @@ tablet - Arduino
 - měření napětí baterií
 - 4G modem
 - OBD
-- měření soláru - serial link
-- hladina pitné vody (ultrazvukově) - IIC
-- hladina odpadní vody
+- měření soláru - UART
+- hladina pitné vody (ultrazvukově, kapacitně) - IIC
+- hladina odpadní vody - kapacitě
 
 spotřeba:
 - automaticky uspat/probudit při napětí < Vbatmin
@@ -47,7 +39,7 @@ připojení
 
 arduino:
 - teploměr - venkovní/vnitřní/lednice/odpadní nádrž
-- osvitoměr-luxmetr BH1750, nebo z kamery-obrázku?
+- osvitoměr-~~luxmetr BH1750, nebo z~~ __kamery-obrázku__?
 - měření baterie
 	- 2x napětí
 	- 1x proud
@@ -122,10 +114,7 @@ pumpe switch
 7 modrá
 8 červená
 
-
-
 akcelerometr přes uart-usb do palubního androidu, tam aplikace na vyčítání
-
 
 tablet: umax 8C LTE
 8 octa core 1.6GHz, Unisoc SC9863a

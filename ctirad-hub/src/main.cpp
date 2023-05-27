@@ -18,6 +18,8 @@
 // Comment the next line for Temperature in Fahrenheit
 #define temperatureCelsius
 
+#define DEBUG
+
 // BLE server name
 #define bleServerName "Ctirad hub"
 
@@ -31,7 +33,8 @@ float hum;
 unsigned long lastTime = 0;
 unsigned long timerDelay = 1000;
 
-bool deviceConnected = false;
+int deviceConnected = 0;
+bool oldDeviceConnected = false;
 
 // See the following for generating UUIDs:
 // https://www.uuidgenerator.net/
@@ -39,7 +42,8 @@ bool deviceConnected = false;
 
 // Temperature Characteristic and Descriptor
 #ifdef temperatureCelsius
-BLECharacteristic bmeTemperatureCelsiusCharacteristics("cba1d466-344c-4be3-ab3f-189f80dd7518", BLECharacteristic::PROPERTY_NOTIFY);
+// BLECharacteristic bmeTemperatureCelsiusCharacteristics("cba1d466-344c-4be3-ab3f-189f80dd7518", BLECharacteristic::PROPERTY_NOTIFY);
+BLECharacteristic bmeTemperatureCelsiusCharacteristics(BLEUUID((uint16_t)0x2A6E), BLECharacteristic::PROPERTY_NOTIFY);
 BLEDescriptor bmeTemperatureCelsiusDescriptor(BLEUUID((uint16_t)0x2902));
 #else
 BLECharacteristic bmeTemperatureFahrenheitCharacteristics("f78ebbff-c8b7-4107-93de-889a6a06d408", BLECharacteristic::PROPERTY_NOTIFY);
@@ -47,7 +51,8 @@ BLEDescriptor bmeTemperatureFahrenheitDescriptor(BLEUUID((uint16_t)0x2902));
 #endif
 
 // Humidity Characteristic and Descriptor
-BLECharacteristic bmeHumidityCharacteristics("ca73b3ba-39f6-4ab3-91ae-186dc9577d99", BLECharacteristic::PROPERTY_NOTIFY);
+// BLECharacteristic bmeHumidityCharacteristics("ca73b3ba-39f6-4ab3-91ae-186dc9577d99", BLECharacteristic::PROPERTY_NOTIFY);
+BLECharacteristic bmeHumidityCharacteristics(BLEUUID((uint16_t)0x2A6F), BLECharacteristic::PROPERTY_NOTIFY);
 BLEDescriptor bmeHumidityDescriptor(BLEUUID((uint16_t)0x2902));
 
 BLECharacteristic bmeSetIntervalCharacteristics("5745929c-5d2b-4e1b-b007-0913c3a86589", BLECharacteristic::PROPERTY_WRITE);
@@ -58,25 +63,39 @@ class MyServerCallbacks : public BLEServerCallbacks
 {
      void onConnect(BLEServer *pServer)
      {
-          deviceConnected = true;
+          deviceConnected++;
+          BLEDevice::startAdvertising();
+#ifdef DEBUG
+          Serial.print("Device connected. Now there are ");
+          Serial.print(deviceConnected);
+          Serial.println(" devices connected.");
+#endif
      };
      void onDisconnect(BLEServer *pServer)
      {
-          deviceConnected = false;
+          deviceConnected--;
+          pServer->startAdvertising(); // restart advertising
+#ifdef DEBUG
+          Serial.print("Device disconnected. Now there are ");
+          Serial.print(deviceConnected);
+          Serial.println(" devices connected.");
+#endif
      }
 };
 
-class MyCallbacks: public BLECharacteristicCallbacks {
-    // při příjmu zprávy proveď následující
-    void onWrite(BLECharacteristic *pCharacteristic) {
-      // načti přijatou zprávu do proměnné
-      uint8_t *data = pCharacteristic->getData();
-      timerDelay = (data[0] << 8) + data[1];
-      // pokud není zpráva prázdná, vypiš její obsah
-      // po znacích po sériové lince
-      Serial.print("New interval=");
-      Serial.println(timerDelay);
-    }
+class MyCallbacks : public BLECharacteristicCallbacks
+{
+     // při příjmu zprávy proveď následující
+     void onWrite(BLECharacteristic *pCharacteristic)
+     {
+          // načti přijatou zprávu do proměnné
+          uint8_t *data = pCharacteristic->getData();
+          timerDelay = (data[0] << 8) + data[1];
+          // pokud není zpráva prázdná, vypiš její obsah
+          // po znacích po sériové lince
+          Serial.print("New interval=");
+          Serial.println(timerDelay);
+     }
 };
 
 // void initBME(){
@@ -102,7 +121,8 @@ void setup()
      pServer->setCallbacks(new MyServerCallbacks());
 
      // Create the BLE Service
-     BLEService *bmeService = pServer->createService(SERVICE_UUID);
+     // BLEService *bmeService = pServer->createService(SERVICE_UUID);
+     BLEService *bmeService = pServer->createService(BLEUUID((uint16_t)0x181A));
 
 // Create BLE Characteristics and Create a BLE Descriptor
 // Temperature
@@ -115,6 +135,13 @@ void setup()
      bmeTemperatureFahrenheitDescriptor.setValue("BME temperature Fahrenheit");
      bmeTemperatureFahrenheitCharacteristics.addDescriptor(&bmeTemperatureFahrenheitDescriptor);
 #endif
+
+     BLEDescriptor outdoorHumidityDescriptor(BLEUUID((uint16_t)0x2901));
+     BLEDescriptor outdoorTemperatureDescriptor(BLEUUID((uint16_t)0x2901));
+     outdoorHumidityDescriptor.setValue("Humidity 0 to 100%");
+     outdoorTemperatureDescriptor.setValue("Temperature -40-60°C");
+     bmeHumidityCharacteristics.addDescriptor(&outdoorHumidityDescriptor);
+     bmeTemperatureCelsiusCharacteristics.addDescriptor(&outdoorTemperatureDescriptor);
 
      // Humidity
      bmeService->addCharacteristic(&bmeHumidityCharacteristics);
@@ -157,7 +184,10 @@ void loop()
                static char temperatureCTemp[6];
                dtostrf(temp, 6, 2, temperatureCTemp);
                // Set temperature Characteristic value and notify connected client
-               bmeTemperatureCelsiusCharacteristics.setValue(temperatureCTemp);
+               // bmeTemperatureCelsiusCharacteristics.setValue(temperatureCTemp);
+
+               int16_t nTempOut = millis();
+               bmeTemperatureCelsiusCharacteristics.setValue((uint8_t *)&nTempOut, 2);
                bmeTemperatureCelsiusCharacteristics.notify();
                Serial.print("Temperature Celsius: ");
                Serial.print(temp);
@@ -177,7 +207,10 @@ void loop()
                static char humidityTemp[6];
                dtostrf(hum, 6, 2, humidityTemp);
                // Set humidity Characteristic value and notify connected client
-               bmeHumidityCharacteristics.setValue(humidityTemp);
+               // bmeHumidityCharacteristics.setValue(humidityTemp);
+
+               bmeHumidityCharacteristics.setValue((uint8_t *)&nTempOut, 2);
+
                bmeHumidityCharacteristics.notify();
                Serial.print(" - Humidity: ");
                Serial.print(hum);
