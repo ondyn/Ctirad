@@ -14,14 +14,14 @@
 // #include <Adafruit_Sensor.h>
 // #include <Adafruit_BME280.h>
 
-//Default Temperature is in Celsius
-//Comment the next line for Temperature in Fahrenheit
+// Default Temperature is in Celsius
+// Comment the next line for Temperature in Fahrenheit
 #define temperatureCelsius
 
-//BLE server name
-#define bleServerName "Ctirad_hub"
+// BLE server name
+#define bleServerName "Ctirad hub"
 
-//Adafruit_BME280 bme; // I2C
+// Adafruit_BME280 bme; // I2C
 
 float temp;
 float tempF;
@@ -39,25 +39,44 @@ bool deviceConnected = false;
 
 // Temperature Characteristic and Descriptor
 #ifdef temperatureCelsius
-  BLECharacteristic bmeTemperatureCelsiusCharacteristics("cba1d466-344c-4be3-ab3f-189f80dd7518", BLECharacteristic::PROPERTY_NOTIFY);
-  BLEDescriptor bmeTemperatureCelsiusDescriptor(BLEUUID((uint16_t)0x2902));
+BLECharacteristic bmeTemperatureCelsiusCharacteristics("cba1d466-344c-4be3-ab3f-189f80dd7518", BLECharacteristic::PROPERTY_NOTIFY);
+BLEDescriptor bmeTemperatureCelsiusDescriptor(BLEUUID((uint16_t)0x2902));
 #else
-  BLECharacteristic bmeTemperatureFahrenheitCharacteristics("f78ebbff-c8b7-4107-93de-889a6a06d408", BLECharacteristic::PROPERTY_NOTIFY);
-  BLEDescriptor bmeTemperatureFahrenheitDescriptor(BLEUUID((uint16_t)0x2902));
+BLECharacteristic bmeTemperatureFahrenheitCharacteristics("f78ebbff-c8b7-4107-93de-889a6a06d408", BLECharacteristic::PROPERTY_NOTIFY);
+BLEDescriptor bmeTemperatureFahrenheitDescriptor(BLEUUID((uint16_t)0x2902));
 #endif
 
 // Humidity Characteristic and Descriptor
 BLECharacteristic bmeHumidityCharacteristics("ca73b3ba-39f6-4ab3-91ae-186dc9577d99", BLECharacteristic::PROPERTY_NOTIFY);
-BLEDescriptor bmeHumidityDescriptor(BLEUUID((uint16_t)0x2903));
+BLEDescriptor bmeHumidityDescriptor(BLEUUID((uint16_t)0x2902));
 
-//Setup callbacks onConnect and onDisconnect
-class MyServerCallbacks: public BLEServerCallbacks {
-  void onConnect(BLEServer* pServer) {
-    deviceConnected = true;
-  };
-  void onDisconnect(BLEServer* pServer) {
-    deviceConnected = false;
-  }
+BLECharacteristic bmeSetIntervalCharacteristics("5745929c-5d2b-4e1b-b007-0913c3a86589", BLECharacteristic::PROPERTY_WRITE);
+BLEDescriptor bmeSetIntervalDescriptor(BLEUUID((uint16_t)0x2902));
+
+// Setup callbacks onConnect and onDisconnect
+class MyServerCallbacks : public BLEServerCallbacks
+{
+     void onConnect(BLEServer *pServer)
+     {
+          deviceConnected = true;
+     };
+     void onDisconnect(BLEServer *pServer)
+     {
+          deviceConnected = false;
+     }
+};
+
+class MyCallbacks: public BLECharacteristicCallbacks {
+    // při příjmu zprávy proveď následující
+    void onWrite(BLECharacteristic *pCharacteristic) {
+      // načti přijatou zprávu do proměnné
+      uint8_t *data = pCharacteristic->getData();
+      timerDelay = (data[0] << 8) + data[1];
+      // pokud není zpráva prázdná, vypiš její obsah
+      // po znacích po sériové lince
+      Serial.print("New interval=");
+      Serial.println(timerDelay);
+    }
 };
 
 // void initBME(){
@@ -67,94 +86,104 @@ class MyServerCallbacks: public BLEServerCallbacks {
 //   }
 // }
 
-void setup() {
-  // Start serial communication 
-  Serial.begin(115200);
+void setup()
+{
+     // Start serial communication
+     Serial.begin(115200);
 
-  // Init BME Sensor
-  //initBME();
+     // Init BME Sensor
+     // initBME();
 
-  // Create the BLE Device
-  BLEDevice::init(bleServerName);
+     // Create the BLE Device
+     BLEDevice::init(bleServerName);
 
-  // Create the BLE Server
-  BLEServer *pServer = BLEDevice::createServer();
-  pServer->setCallbacks(new MyServerCallbacks());
+     // Create the BLE Server
+     BLEServer *pServer = BLEDevice::createServer();
+     pServer->setCallbacks(new MyServerCallbacks());
 
-  // Create the BLE Service
-  BLEService *bmeService = pServer->createService(SERVICE_UUID);
+     // Create the BLE Service
+     BLEService *bmeService = pServer->createService(SERVICE_UUID);
 
-  // Create BLE Characteristics and Create a BLE Descriptor
-  // Temperature
-  #ifdef temperatureCelsius
-    bmeService->addCharacteristic(&bmeTemperatureCelsiusCharacteristics);
-    bmeTemperatureCelsiusDescriptor.setValue("BME temperature Celsius");
-    bmeTemperatureCelsiusCharacteristics.addDescriptor(&bmeTemperatureCelsiusDescriptor);
-  #else
-    bmeService->addCharacteristic(&bmeTemperatureFahrenheitCharacteristics);
-    bmeTemperatureFahrenheitDescriptor.setValue("BME temperature Fahrenheit");
-    bmeTemperatureFahrenheitCharacteristics.addDescriptor(&bmeTemperatureFahrenheitDescriptor);
-  #endif  
+// Create BLE Characteristics and Create a BLE Descriptor
+// Temperature
+#ifdef temperatureCelsius
+     bmeService->addCharacteristic(&bmeTemperatureCelsiusCharacteristics);
+     bmeTemperatureCelsiusDescriptor.setValue("BME temperature Celsius");
+     bmeTemperatureCelsiusCharacteristics.addDescriptor(&bmeTemperatureCelsiusDescriptor);
+#else
+     bmeService->addCharacteristic(&bmeTemperatureFahrenheitCharacteristics);
+     bmeTemperatureFahrenheitDescriptor.setValue("BME temperature Fahrenheit");
+     bmeTemperatureFahrenheitCharacteristics.addDescriptor(&bmeTemperatureFahrenheitDescriptor);
+#endif
 
-  // Humidity
-  bmeService->addCharacteristic(&bmeHumidityCharacteristics);
-  bmeHumidityDescriptor.setValue("BME humidity");
-  bmeHumidityCharacteristics.addDescriptor(&bmeHumidityDescriptor);
-  
-  // Start the service
-  bmeService->start();
+     // Humidity
+     bmeService->addCharacteristic(&bmeHumidityCharacteristics);
+     bmeHumidityDescriptor.setValue("BME humidity");
+     bmeHumidityCharacteristics.addDescriptor(&bmeHumidityDescriptor);
 
-  // Start advertising
-  BLEAdvertising *pAdvertising = BLEDevice::getAdvertising();
-  pAdvertising->addServiceUUID(SERVICE_UUID);
-  pServer->getAdvertising()->start();
-  Serial.println("Waiting a client connection to notify...");
+     bmeService->addCharacteristic(&bmeSetIntervalCharacteristics);
+     bmeSetIntervalDescriptor.setValue("Interval");
+     bmeSetIntervalCharacteristics.addDescriptor(&bmeSetIntervalDescriptor);
+
+     bmeSetIntervalCharacteristics.setCallbacks(new MyCallbacks());
+
+     // Start the service
+     bmeService->start();
+
+     // Start advertising
+     BLEAdvertising *pAdvertising = BLEDevice::getAdvertising();
+     pAdvertising->addServiceUUID(SERVICE_UUID);
+     pServer->getAdvertising()->start();
+     Serial.println("Waiting a client connection to notify...");
 }
 
-void loop() {
-  if (deviceConnected) {
-    if ((millis() - lastTime) > timerDelay) {
-      // Read temperature as Celsius (the default)
-      //temp = bme.readTemperature();
-      temp = millis()/100;
-      // Fahrenheit
-      tempF = 1.8*temp +32;
-      // Read humidity
-      //hum = bme.readHumidity();
-      hum = millis()/10;
-  
-      //Notify temperature reading from BME sensor
-      #ifdef temperatureCelsius
-        static char temperatureCTemp[6];
-        dtostrf(temp, 6, 2, temperatureCTemp);
-        //Set temperature Characteristic value and notify connected client
-        bmeTemperatureCelsiusCharacteristics.setValue(temperatureCTemp);
-        bmeTemperatureCelsiusCharacteristics.notify();
-        Serial.print("Temperature Celsius: ");
-        Serial.print(temp);
-        Serial.print(" ºC");
-      #else
-        static char temperatureFTemp[6];
-        dtostrf(tempF, 6, 2, temperatureFTemp);
-        //Set temperature Characteristic value and notify connected client
-        bmeTemperatureFahrenheitCharacteristics.setValue(temperatureFTemp);
-        bmeTemperatureFahrenheitCharacteristics.notify();
-        Serial.print("Temperature Fahrenheit: ");
-        Serial.print(tempF);
-        Serial.print(" ºF");
-      #endif
-      
-      //Notify humidity reading from BME
-      static char humidityTemp[6];
-      dtostrf(hum, 6, 2, humidityTemp);
-      //Set humidity Characteristic value and notify connected client
-      bmeHumidityCharacteristics.setValue(humidityTemp);
-      bmeHumidityCharacteristics.notify();   
-      Serial.print(" - Humidity: ");
-      Serial.print(hum);
-      Serial.println(" %");
-      
-      lastTime = millis();
-    }
-  }
+void loop()
+{
+     if (deviceConnected)
+     {
+          if ((millis() - lastTime) > timerDelay)
+          {
+               // Read temperature as Celsius (the default)
+               // temp = bme.readTemperature();
+               temp = millis() / 100;
+               // Fahrenheit
+               tempF = 1.8 * temp + 32;
+               // Read humidity
+               // hum = bme.readHumidity();
+               hum = millis() / 10;
+
+// Notify temperature reading from BME sensor
+#ifdef temperatureCelsius
+               static char temperatureCTemp[6];
+               dtostrf(temp, 6, 2, temperatureCTemp);
+               // Set temperature Characteristic value and notify connected client
+               bmeTemperatureCelsiusCharacteristics.setValue(temperatureCTemp);
+               bmeTemperatureCelsiusCharacteristics.notify();
+               Serial.print("Temperature Celsius: ");
+               Serial.print(temp);
+               Serial.print(" ºC");
+#else
+               static char temperatureFTemp[6];
+               dtostrf(tempF, 6, 2, temperatureFTemp);
+               // Set temperature Characteristic value and notify connected client
+               bmeTemperatureFahrenheitCharacteristics.setValue(temperatureFTemp);
+               bmeTemperatureFahrenheitCharacteristics.notify();
+               Serial.print("Temperature Fahrenheit: ");
+               Serial.print(tempF);
+               Serial.print(" ºF");
+#endif
+
+               // Notify humidity reading from BME
+               static char humidityTemp[6];
+               dtostrf(hum, 6, 2, humidityTemp);
+               // Set humidity Characteristic value and notify connected client
+               bmeHumidityCharacteristics.setValue(humidityTemp);
+               bmeHumidityCharacteristics.notify();
+               Serial.print(" - Humidity: ");
+               Serial.print(hum);
+               Serial.println(" %");
+
+               lastTime = millis();
+          }
+     }
 }
