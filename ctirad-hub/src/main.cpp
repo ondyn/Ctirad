@@ -16,6 +16,7 @@
 
 // Characteristic UUID
 #define TEMPERATURE 0x2A6E
+#define TEMPERATURE2 "ca788368-1012-4adf-8442-135e3a041058"
 #define HUMIDITY 0x2A6F
 #define CHARGING_SWITCH "3fc4597a-627c-4999-97f0-fa9c9d04a5f8"
 
@@ -40,7 +41,7 @@ int devicesConnected = 0;
 BLECharacteristic temperatureCharacteristic(BLEUUID((uint16_t)TEMPERATURE), BLECharacteristic::PROPERTY_NOTIFY);
 
 // T2
-BLECharacteristic t2(BLEUUID("ca788368-1012-4adf-8442-135e3a041058"), BLECharacteristic::PROPERTY_NOTIFY);
+BLECharacteristic t2(BLEUUID(TEMPERATURE2), BLECharacteristic::PROPERTY_NOTIFY);
 
 // Humidity Characteristic
 BLECharacteristic humidityCharacteristic(BLEUUID((uint16_t)HUMIDITY), BLECharacteristic::PROPERTY_NOTIFY);
