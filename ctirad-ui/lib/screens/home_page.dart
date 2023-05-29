@@ -46,7 +46,7 @@ class _HomePageState extends State<HomePage>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(vsync: this, length: 6);
+    _tabController = TabController(vsync: this, length: 5);
 
     _tabController.addListener(_handleTabSelection);
     _handleTabSelection();
@@ -96,7 +96,7 @@ class _HomePageState extends State<HomePage>
               tabs: const <Tab>[
                 Tab(icon: Icon(Icons.access_time)),
                 Tab(icon: Icon(Icons.battery_std)),
-                Tab(icon: Icon(Icons.directions_car)),
+                // Tab(icon: Icon(Icons.directions_car)),
                 Tab(icon: Icon(Icons.wb_sunny_outlined)),
                 Tab(icon: Icon(Icons.device_thermostat)),
                 Tab(icon: Icon(Icons.camera_alt)),
@@ -111,7 +111,7 @@ class _HomePageState extends State<HomePage>
             children: <Widget>[
               const ClockScreen(),
               const BatteryScreen(),
-              const Serial2(),
+              // const Serial2(),
               Center(
                 child: Column(
                   children: const <Text>[
