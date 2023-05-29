@@ -9,13 +9,15 @@
 // BLE server name
 #define BLE_SERVER_NAME "Ctirad hub"
 
-//Service UUID
+// Service UUID
 #define ENVIRONMENTAL_SENSING 0x181A
+#define COMMAND_CHARACTERISTIC_UUID "d3dce6c6-4f16-4f03-9098-69bb542682ce"
 #define SENDING_INTERVAL_CHARACTERISTIC_UUID "5745929c-5d2b-4e1b-b007-0913c3a86589"
 
-//Characteristic UUID
+// Characteristic UUID
 #define TEMPERATURE 0x2A6E
 #define HUMIDITY 0x2A6F
+#define CHARGING_SWITCH "3fc4597a-627c-4999-97f0-fa9c9d04a5f8"
 
 // descriptors UUID
 #define CHARACTERISTIC_USER_DESCRIPTION 0x2901
@@ -36,10 +38,16 @@ int devicesConnected = 0;
 
 // Temperature Characteristic
 BLECharacteristic temperatureCharacteristic(BLEUUID((uint16_t)TEMPERATURE), BLECharacteristic::PROPERTY_NOTIFY);
+
+// T2
+BLECharacteristic t2(BLEUUID("ca788368-1012-4adf-8442-135e3a041058"), BLECharacteristic::PROPERTY_NOTIFY);
+
 // Humidity Characteristic
 BLECharacteristic humidityCharacteristic(BLEUUID((uint16_t)HUMIDITY), BLECharacteristic::PROPERTY_NOTIFY);
 // Sending interval Characteristic
 BLECharacteristic sendingIntervalCharacteristic(SENDING_INTERVAL_CHARACTERISTIC_UUID, BLECharacteristic::PROPERTY_WRITE);
+
+BLECharacteristic chargingSwitchCharacteristic(BLEUUID(CHARGING_SWITCH), BLECharacteristic::PROPERTY_WRITE);
 
 // Setup callbacks onConnect and onDisconnect
 class MyServerCallbacks : public BLEServerCallbacks
@@ -71,15 +79,33 @@ class MyCallbacks : public BLECharacteristicCallbacks
      // při příjmu zprávy proveď následující
      void onWrite(BLECharacteristic *pCharacteristic)
      {
-          // načti přijatou zprávu do proměnné
-          uint8_t *data = pCharacteristic->getData();
-          timerDelay = (data[0] << 8) + data[1];
-          // pokud není zpráva prázdná, vypiš její obsah
-          // po znacích po sériové lince
-          Serial.print("New interval=");
-          Serial.println(timerDelay);
+          if (pCharacteristic->getUUID().toString() == BLEUUID(SENDING_INTERVAL_CHARACTERISTIC_UUID).toString())
+          {
+               // načti přijatou zprávu do proměnné
+               uint8_t *data = pCharacteristic->getData();
+               timerDelay = (data[0] << 8) + data[1];
+               // pokud není zpráva prázdná, vypiš její obsah
+               // po znacích po sériové lince
+               Serial.print("New interval=");
+               Serial.println(timerDelay);
+          }
+          if (pCharacteristic->getUUID().toString() == BLEUUID(CHARGING_SWITCH).toString())
+          {
+               Serial.print("New charging switch cmd=");
+               Serial.println(pCharacteristic->getData()[0]);
+          }
      }
 };
+
+void setupCharacteristic(BLECharacteristic characteristic, std::string userDescription, BLEService *service)
+{
+     BLEDescriptor configDescriptor(BLEUUID((uint16_t)CLIENT_CHARACTERISTIC_CONFIGURATION));
+     characteristic.addDescriptor(&configDescriptor);
+     BLEDescriptor userDescriptor(BLEUUID((uint16_t)CHARACTERISTIC_USER_DESCRIPTION));
+     userDescriptor.setValue(userDescription);
+     characteristic.addDescriptor(&userDescriptor);
+     service->addCharacteristic(&characteristic);
+}
 
 void setup()
 {
@@ -104,6 +130,15 @@ void setup()
      temperatureUserDescriptor.setValue("T1");
      temperatureCharacteristic.addDescriptor(&temperatureUserDescriptor);
      sensorService->addCharacteristic(&temperatureCharacteristic);
+
+     // T2
+     BLEDescriptor t2ConfigDescriptor(BLEUUID((uint16_t)CLIENT_CHARACTERISTIC_CONFIGURATION));
+     t2.addDescriptor(&t2ConfigDescriptor);
+     BLEDescriptor t2UserDescriptor(BLEUUID((uint16_t)CHARACTERISTIC_USER_DESCRIPTION));
+     t2UserDescriptor.setValue("T2");
+     t2.addDescriptor(&t2UserDescriptor);
+     sensorService->addCharacteristic(&t2);
+
      // Humidity
      BLEDescriptor humidityConfigDescriptor(BLEUUID((uint16_t)CLIENT_CHARACTERISTIC_CONFIGURATION));
      humidityCharacteristic.addDescriptor(&humidityConfigDescriptor);
@@ -118,8 +153,20 @@ void setup()
      sendingIntervalCharacteristic.setCallbacks(new MyCallbacks());
      sensorService->addCharacteristic(&sendingIntervalCharacteristic);
 
+     // Charging switch
+     BLEService *commandService = pServer->createService(BLEUUID(COMMAND_CHARACTERISTIC_UUID));
+
+     BLEDescriptor chargingSwitchConfigDescriptor(BLEUUID((uint16_t)CLIENT_CHARACTERISTIC_CONFIGURATION));
+     chargingSwitchCharacteristic.addDescriptor(&chargingSwitchConfigDescriptor);
+     // BLEDescriptor chargingSwitchUserDescriptor(BLEUUID((uint16_t)CHARACTERISTIC_USER_DESCRIPTION));
+     // chargingSwitchUserDescriptor.setValue("Charging switch");
+     // chargingSwitchCharacteristic.addDescriptor(&chargingSwitchUserDescriptor);
+     chargingSwitchCharacteristic.setCallbacks(new MyCallbacks());
+     commandService->addCharacteristic(&chargingSwitchCharacteristic);
+
      // Start the service
      sensorService->start();
+     commandService->start();
 
      // Start advertising
      pServer->getAdvertising()->start();
@@ -151,6 +198,9 @@ void loop()
                int16_t nTempOut = millis();
                temperatureCharacteristic.setValue((uint8_t *)&nTempOut, 2);
                temperatureCharacteristic.notify();
+               t2.setValue((uint8_t *)&nTempOut, 2);
+               t2.notify();
+
                Serial.print("Temperature Celsius: ");
                Serial.print(temp);
                Serial.print(" ºC");
