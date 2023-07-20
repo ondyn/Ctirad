@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:battery_plus/battery_plus.dart';
+import 'package:ctirad_ui/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -8,7 +9,7 @@ import '../models/battery_provider.dart';
 import 'battery_screen.dart';
 import 'camera_screen.dart';
 import 'clock_screen.dart';
-import 'serial2.dart';
+// import 'serial2.dart';
 import 'settings/app_settings_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -79,11 +80,27 @@ class _HomePageState extends State<HomePage>
             actions: <Widget>[
               Consumer<BatteryProvider>(builder: (BuildContext context,
                   BatteryProvider provider, Widget? child) {
-                if (provider.batteryState == BatteryState.charging) {
-                  return const Icon(Icons.battery_charging_full);
+                Color color = Colors.deepPurpleAccent;
+                switch (provider.batteryState) {
+                  case BatteryState.charging:
+                    color = Colors.green.shade100;
+                    break;
+                  case BatteryState.full:
+                    color = Colors.green;
+                    break;
+                  case BatteryState.discharging:
+                    color = Colors.red.shade100;
+                    break;
+                  case BatteryState.unknown:
+                    color = Colors.orange;
+                    break;
                 }
-                return const SizedBox.shrink();
+                return Text(
+                  '${provider.batteryLevel}%',
+                  style: TextStyle(color: color),
+                );
               }),
+              const BleStatusNotification(),
               IconButton(
                 icon: const Icon(Icons.settings),
                 onPressed: () {
@@ -112,9 +129,9 @@ class _HomePageState extends State<HomePage>
               const ClockScreen(),
               const BatteryScreen(),
               // const Serial2(),
-              Center(
+              const Center(
                 child: Column(
-                  children: const <Text>[
+                  children: <Text>[
                     Text('ahoj'),
                   ],
                 ),
@@ -128,7 +145,7 @@ class _HomePageState extends State<HomePage>
                     ),
                     Text(
                       '$_counter',
-                      style: Theme.of(context).textTheme.headline4,
+                      style: Theme.of(context).textTheme.headlineMedium,
                     ),
                     const Text('baudrate'),
                     OutlinedButton(

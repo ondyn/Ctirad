@@ -1,3 +1,4 @@
+import 'package:ctirad_ui/screens/settings/ble_settings_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screen_wake/flutter_screen_wake.dart';
 import 'package:flutter_settings_screens/flutter_settings_screens.dart';
@@ -17,6 +18,13 @@ class _AppSettingsState extends State<AppSettings> {
       child: SettingsScreen(
         title: 'Application Settings',
         children: [
+          SettingsGroup(title: 'Bluetooth LE', children: <Widget>[
+            IconButton(
+                onPressed: () {
+                  openBleSettings(context);
+                },
+                icon: const Icon(Icons.bluetooth))
+          ]),
           SettingsGroup(
             title: 'Battery charging levels',
             children: <Widget>[
@@ -435,5 +443,11 @@ class _AppSettingsState extends State<AppSettings> {
         ],
       ),
     );
+  }
+
+  void openBleSettings(BuildContext context) {
+    Navigator.of(context).push(MaterialPageRoute(
+      builder: (BuildContext context) => const BleSettings(),
+    ));
   }
 }
